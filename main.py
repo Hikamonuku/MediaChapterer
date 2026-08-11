@@ -105,6 +105,15 @@ def get_video_duration(video_path):
     duration_seconds = float(result.stdout.strip())
     return int(duration_seconds * 1000)
 
+def build_chapter_ranges(chapters, duration_ms):
+    for index, chapter in enumerate(chapters):
+        chapter["start_ms"] = chapter["time_ms"]
+        if index < len(chapters) - 1:
+            chapter["end_ms"] = chapters[index + 1]["time_ms"]
+        else:
+            chapter["end_ms"] = duration_ms
+    return chapters
+
 def main_menu():
     if not check_ffmpeg():
         return
@@ -113,8 +122,15 @@ def main_menu():
     duration_ms = get_video_duration(video_path)
     if duration_ms is None:
         return
+    chapters = build_chapter_ranges(chapters, duration_ms)
     print(f"\nVideo: {video_path}")
     print(f"Duration: {duration_ms} ms")
+    print("\n=== CHAPTER RANGES ===")
+    for chapter in chapters:
+        print(
+            f"{chapter['title']}: "
+            f"{chapter['start_ms']} -> {chapter['end_ms']}"
+        )
 
 if __name__ == "__main__":
     main_menu()
