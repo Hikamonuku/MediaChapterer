@@ -6,6 +6,12 @@ The program allows the user to select a video file directly or choose a video fr
 
 The original video is preserved.
 
+## Status
+
+Early development version.
+
+The core chapter creation and embedding functionality is working.
+
 ## Features
 
 - Select a video file directly
