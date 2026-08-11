@@ -175,6 +175,7 @@ def embed_chapters(video_path, metadata_path):
     )
     command = [
         "ffmpeg",
+        "-fflags", "+genpts",
         "-i", str(video),
         "-f", "ffmetadata",
         "-i", str(metadata_path),
@@ -189,7 +190,7 @@ def embed_chapters(video_path, metadata_path):
     if result.returncode != 0:
         print("\nFailed to create chaptered video.")
         return None
-    print(f"\nChaptered video created:")
+    print("\nChaptered video created:")
     print(output_path)
     return str(output_path)
 
