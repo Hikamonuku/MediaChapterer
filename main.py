@@ -1,3 +1,13 @@
+import shutil
+
+def check_ffmpeg():
+    ffmpeg = shutil.which("ffmpeg")
+    ffprobe = shutil.which("ffprobe")
+    if ffmpeg is None or ffprobe is None:
+        print("FFmpeg/ffprobe not found.")
+        return False
+    return True
+
 def time_to_ms(time):
     parts = time.split(":")
     total_seconds = 0
@@ -8,13 +18,11 @@ def time_to_ms(time):
     return total_seconds * 1000
 
 def main_menu():
+    if not check_ffmpeg():
+        return
+    video_path = select_video()
     chapters = collect_chapters()
-    print("\n=== CHAPTERS ===")
-    for chapter in chapters:
-        print(
-            f"{chapter['time']} - {chapter['title']} "
-            f"({chapter['time_ms']} ms)"
-        )
+    print(f"\nVideo: {video_path}")
 
 def collect_chapters():
     chapters = []
