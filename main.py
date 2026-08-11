@@ -2,6 +2,15 @@ import shutil
 import subprocess
 from pathlib import Path
 
+VIDEO_EXTENSIONS = {
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mov",
+    ".webm",
+    ".m4v"
+}
+
 def check_ffmpeg():
     ffmpeg = shutil.which("ffmpeg")
     ffprobe = shutil.which("ffprobe")
@@ -25,10 +34,36 @@ def time_to_ms(time):
 
 def select_video():
     while True:
-        video_path = input("Video file: ").strip().strip('"')
-        if Path(video_path).is_file():
-            return video_path
-        print("File not found. Try again.")
+        user_input = input("Video file or folder: ").strip().strip('"')
+        path = Path(user_input)
+        if path.is_file():
+            if path.suffix.lower() in VIDEO_EXTENSIONS:
+                return str(path)
+            print("Unsupported video format.")
+            continue
+        if path.is_dir():
+            videos = [
+                file
+                for file in path.iterdir()
+                if file.is_file()
+                and file.suffix.lower() in VIDEO_EXTENSIONS
+            ]
+            if not videos:
+                print("No compatible video files found in this folder.")
+                continue
+            videos.sort(key=lambda video: video.name.lower())
+            print("\n=== VIDEOS FOUND ===")
+            for index, video in enumerate(videos, start=1):
+                print(f"{index}. {video.name}")
+            while True:
+                choice = input("Select video: ").strip()
+                if choice.isdigit():
+                    choice = int(choice)
+                    if 1 <= choice <= len(videos):
+                        return str(videos[choice - 1])
+                print("Invalid option.")
+        else:
+            print("File or folder not found. Try again.")
 
 def collect_chapters():
     chapters = []
