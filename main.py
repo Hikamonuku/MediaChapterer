@@ -37,5 +37,9 @@ def collect_chapters():
     chapters.sort(key=lambda chapter: chapter["time_ms"])
     return chapters
 
+def select_video():
+    video_path = input("Video file: ").strip().strip('"')
+    return video_path
+
 if __name__ == "__main__":
     main_menu()
