@@ -8,26 +8,34 @@ def time_to_ms(time):
     return total_seconds * 1000
 
 def main_menu():
-    chapters = []
-    while True:
-        time = input("Chapter Start (HH:MM:SS): ")
-        title = input("Chapter Title: ")
-        chapter = {
-            "time": time,
-            "time_ms": time_to_ms(time),
-            "title": title
-        }
-        chapters.append(chapter)
-        another = input("Add another chapter? [Y/N]: ").lower()
-        if another != "y":
-            break
-    chapters.sort(key=lambda chapter: chapter["time_ms"])
+    chapters = collect_chapters()
     print("\n=== CHAPTERS ===")
     for chapter in chapters:
         print(
             f"{chapter['time']} - {chapter['title']} "
             f"({chapter['time_ms']} ms)"
         )
+
+def collect_chapters():
+    chapters = []
+    while True:
+        entry = input("Chapter (HH:MM:SS - Title): ").strip()
+        if " - " in entry:
+            time, title = entry.split(" - ", 1)
+        else:
+            time = entry
+            title = input("Chapter Title: ").strip()
+        chapter = {
+            "time": time.strip(),
+            "time_ms": time_to_ms(time.strip()),
+            "title": title.strip()
+        }
+        chapters.append(chapter)
+        another = input("Add another chapter? [Y/N]: ").lower()
+        if another != "y":
+            break
+    chapters.sort(key=lambda chapter: chapter["time_ms"])
+    return chapters
 
 if __name__ == "__main__":
     main_menu()
