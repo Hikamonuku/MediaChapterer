@@ -140,6 +140,13 @@ def main_menu():
         duration_ms
     )
     print(f"\nMetadata created: {metadata_path}")
+    output_path = embed_chapters(
+        video_path,
+        metadata_path
+    )
+    if output_path is None:
+        return
+    print("\nDone.")
 
 def create_ffmetadata(chapters, duration_ms, output_path="chapters.txt"):
     lines = [";FFMETADATA1", ""]
@@ -160,6 +167,31 @@ def create_ffmetadata(chapters, duration_ms, output_path="chapters.txt"):
     with open(output_path, "w", encoding="utf-8") as file:
         file.write("\n".join(lines))
     return output_path
+
+def embed_chapters(video_path, metadata_path):
+    video = Path(video_path)
+    output_path = video.with_name(
+        f"{video.stem} - Chapters.mkv"
+    )
+    command = [
+        "ffmpeg",
+        "-i", str(video),
+        "-f", "ffmetadata",
+        "-i", str(metadata_path),
+        "-map", "0:v:0",
+        "-map", "0:a?",
+        "-map_metadata", "0",
+        "-map_chapters", "1",
+        "-c", "copy",
+        str(output_path)
+    ]
+    result = subprocess.run(command)
+    if result.returncode != 0:
+        print("\nFailed to create chaptered video.")
+        return None
+    print(f"\nChaptered video created:")
+    print(output_path)
+    return str(output_path)
 
 if __name__ == "__main__":
     main_menu()
