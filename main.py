@@ -122,15 +122,44 @@ def main_menu():
     duration_ms = get_video_duration(video_path)
     if duration_ms is None:
         return
-    chapters = build_chapter_ranges(chapters, duration_ms)
     print(f"\nVideo: {video_path}")
     print(f"Duration: {duration_ms} ms")
     print("\n=== CHAPTER RANGES ===")
-    for chapter in chapters:
+    for index, chapter in enumerate(chapters):
+        start_ms = chapter["time_ms"]
+        if index + 1 < len(chapters):
+            end_ms = chapters[index + 1]["time_ms"]
+        else:
+            end_ms = duration_ms
         print(
             f"{chapter['title']}: "
-            f"{chapter['start_ms']} -> {chapter['end_ms']}"
+            f"{start_ms} -> {end_ms}"
         )
+    metadata_path = create_ffmetadata(
+        chapters,
+        duration_ms
+    )
+    print(f"\nMetadata created: {metadata_path}")
+
+def create_ffmetadata(chapters, duration_ms, output_path="chapters.txt"):
+    lines = [";FFMETADATA1", ""]
+    for index, chapter in enumerate(chapters):
+        start_ms = chapter["time_ms"]
+        if index + 1 < len(chapters):
+            end_ms = chapters[index + 1]["time_ms"]
+        else:
+            end_ms = duration_ms
+        lines.extend([
+            "[CHAPTER]",
+            "TIMEBASE=1/1000",
+            f"START={start_ms}",
+            f"END={end_ms}",
+            f"title={chapter['title']}",
+            ""
+        ])
+    with open(output_path, "w", encoding="utf-8") as file:
+        file.write("\n".join(lines))
+    return output_path
 
 if __name__ == "__main__":
     main_menu()
